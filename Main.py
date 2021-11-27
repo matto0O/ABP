@@ -1,56 +1,23 @@
-from bs4 import BeautifulSoup as Soup
-import requests
+import mysql.connector
 
-url = 'https://www.efortuna.pl/zaklady-bukmacherskie/pilka-nozna/ekstraklasa-polska'
+from Fortuna import insert as fortuna
+from Sts import insert as sts
 
+database = mysql.connector.connect(
+    host="192.168.1.44",
+    port="3307",
+    user="abp",
+    passwd="basedBASED1!",
+    db="abp"
+)
 
-class Event:
-    def __init__(self, name, date, odds):
-        n = name.strip().split(" - ")
-        self.host = n.__getitem__(0)
-        self.visitor = n.__getitem__(1)
-        self.date = date
-        self.odds = odds
+cursor = database.cursor()
+cursor.execute(
+    "CREATE TABLE IF NOT EXISTS games(host VARCHAR(20), visitor VARCHAR(20), date VARCHAR(17), o1 FLOAT(4,2), oX FLOAT(4,2), o2 FLOAT(4,2), o1X FLOAT(4,2), oX2 FLOAT(4,2), o12 FLOAT(4,2))")
 
-    def check_arbitrage(self):
-        bet1_0_2 = 0.0
-        for i in range(0, 3):
-            bet1_0_2 += 1 / float(self.odds.__getitem__(i).text)
-        bet1_02 = 1 / float(self.odds.__getitem__(0).text) + 1 / float(self.odds.__getitem__(4).text)
-        bet0_12 = 1 / float(self.odds.__getitem__(1).text) + 1 / float(self.odds.__getitem__(5).text)
-        bet2_01 = 1 / float(self.odds.__getitem__(2).text) + 1 / float(self.odds.__getitem__(3).text)
+url = 'https://www.efortuna.pl/zaklady-bukmacherskie/pilka-nozna/liga-mistrzow'
+fortuna(database, url)
+url = "https://www.sts.pl/pl/zaklady-bukmacherskie/pilka-nozna/rozgr-klubowe/liga-mistrzow/184/30856/86428/"
+sts(database, url)
 
-        arb_list = [bet1_0_2, bet1_02, bet0_12, bet2_01]
-        arb_list = [round(100 * (1.0 - val), 2) for val in arb_list]
-        print(arb_list)
-
-    def to_str(self):
-        print(self.host + " - " + self.visitor + "\n" + self.date)
-        oddsRows = ""
-        for enum, x in enumerate(self.odds):
-            oddsRows += (x.text + " ")
-            if enum == 2 or enum == 5:
-                print(oddsRows)
-                oddsRows = ""
-        self.check_arbitrage()
-        print("=====================\n")
-
-
-events_list = []
-
-site_contents = requests.get(url)
-site = Soup(site_contents.text, 'lxml')
-games = site.find('tbody')
-
-names = games.findAll('span', class_='market-name')
-dates = games.findAll('span', class_='event-datetime')
-oddsAll = games.findAll('span', class_='odds-value')
-
-for e, name in enumerate(names):
-    oddsList = []
-    for x in range(6 * e, 6 * e + 6):
-        oddsList.append(oddsAll.__getitem__(x))
-    newEvent = Event(name.text, dates.__getitem__(e).text, oddsList)
-    events_list.append(newEvent)
-
-    events_list.__getitem__(e).to_str()
+database.commit()
