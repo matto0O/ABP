@@ -1,0 +1,8 @@
+url,compettition
+https://www.sts.pl/pl/zaklady-bukmacherskie/pilka-nozna/rozgr-klubowe/liga-mistrzow/184/30856/86428/,Liga Mistrzow
+https://www.sts.pl/pl/zaklady-bukmacherskie/pilka-nozna/polska/ekstraklasa/184/30860/86441/,Ekstraklasa
+https://www.sts.pl/pl/zaklady-bukmacherskie/pilka-nozna/anglia/1-liga/184/30862/86451/,Premier League
+https://www.sts.pl/pl/zaklady-bukmacherskie/pilka-nozna/hiszpania/1-liga/184/30867/86464/,La Liga
+https://www.sts.pl/pl/zaklady-bukmacherskie/pilka-nozna/niemcy/1-liga/184/30872/86476/,Bundesliga
+https://www.sts.pl/pl/zaklady-bukmacherskie/pilka-nozna/wlochy/1-liga/184/30874/86484/,Serie A
+https://www.sts.pl/pl/zaklady-bukmacherskie/pilka-nozna/francja/1-liga/184/30868/86465/,Ligue 1

@@ -1,0 +1,8 @@
+url,compettition
+https://www.efortuna.pl/zaklady-bukmacherskie/pilka-nozna/liga-mistrzow,Liga Mistrzow
+https://www.efortuna.pl/zaklady-bukmacherskie/pilka-nozna/ekstraklasa-polska,Ekstraklasa
+https://www.efortuna.pl/zaklady-bukmacherskie/pilka-nozna/1-anglia,Premier League
+https://www.efortuna.pl/zaklady-bukmacherskie/pilka-nozna/1-hiszpania,La Liga
+https://www.efortuna.pl/zaklady-bukmacherskie/pilka-nozna/1-niemcy,Bundesliga
+https://www.efortuna.pl/zaklady-bukmacherskie/pilka-nozna/1-wlochy,Serie A
+https://www.efortuna.pl/zaklady-bukmacherskie/pilka-nozna/1-francja,Ligue 1
