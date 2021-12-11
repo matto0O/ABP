@@ -1,5 +1,4 @@
 import mysql.connector
-import csv
 import pandas as pd
 
 from Finder import addNamesToDatabase
@@ -20,36 +19,44 @@ timeS = time.time()
 cursor = database.cursor()
 
 # cursor.execute(
-#     "CREATE TABLE IF NOT EXISTS games(host VARCHAR(20) NOT NULL, visitor VARCHAR(20) NOT NULL,"
-#     " date DATETIME NOT NULL,"
-#     " o1 FLOAT(4,2) FOREIGN KEY NOT NULL, oX FLOAT(4,2) FOREIGN KEY NOT NULL, o2 FLOAT(4,2) FOREIGN KEY NOT NULL,"
-#     " o1X FLOAT(4,2) FOREIGN KEY, oX2 FLOAT(4,2) FOREIGN KEY, o12 FLOAT(4,2) FOREIGN KEY,"
-#     " competition VARCHAR(25) NOT NULL)")
+#     "CREATE TABLE IF NOT EXISTS games"
+#     "(hostID INT, visitorID INT NOT NULL,"
+#     "date DATETIME, o1 DECIMAL(4,2) NOT NULL, oX DECIMAL(4,2) NOT NULL, o2 DECIMAL(4,2) NOT NULL,"
+#     " o1X DECIMAL(4,2), oX2 DECIMAL(4,2), o12 DECIMAL(4,2), competition VARCHAR(25) NOT NULL,"
+#     "updated TINYINT(1) NOT NULL, visited TINYINT(1) NOT NULL, bookie VARCHAR(12) NOT NULL,"
+#     " PRIMARY KEY (hostID, date, bookie))")
 
-fortunaSet = set()
-stsSet = set()
+cursor.execute("UPDATE games SET updated = 0, visited = 0")
 
 df_Fortuna = pd.read_csv("fortunacsv.txt")
 df_Sts = pd.read_csv("stscsv.txt")
 
-print(df_Sts)
-
 for e in range(df_Sts.__len__()):
-    if e == 0:
+    # addNamesToDatabase(
+    #     sorted(Fortuna.findTeams(df_Fortuna.iloc[e].__getitem__(0)), key=(lambda string: len(string)), reverse=True),
+    #     sorted(Sts.findTeams(df_Sts.iloc[e].__getitem__(0)), key=(lambda string: len(string)), reverse=True), cursor
+    # )
+    if not Sts.insert(cursor, df_Sts.iloc[e].__getitem__(0), df_Sts.iloc[e].__getitem__(1)):
         continue
-    fortunaList = sorted(Fortuna.findTeams(df_Fortuna.iloc[e].__getitem__(0)), key=(lambda string: len(string)), reverse=True)
-    stsList = sorted(Sts.findTeams(df_Sts.iloc[e].__getitem__(0)), key=(lambda string: len(string)), reverse=True)
-    addNamesToDatabase(fortunaList,stsList,cursor)
+    Fortuna.insert(cursor, df_Fortuna.iloc[e].__getitem__(0), df_Fortuna.iloc[e].__getitem__(1))
+
+cursor.execute("DELETE FROM games WHERE date < now() or visited = 0")
+
+# cursor.execute("CREATE TABLE IF NOT EXISTS arbitrage"
+#                 "(hostID INT, visitorID INT,"
+#                 "date DATETIME, o1 DECIMAL(4,2) NOT NULL, oX DECIMAL(4,2) NOT NULL, o2 DECIMAL(4,2) NOT NULL,"
+#                 " o1X DECIMAL(4,2), oX2 DECIMAL(4,2), o12 DECIMAL(4,2), competition VARCHAR(25) NOT NULL,"
+#                 " PRIMARY KEY (hostID, visitorID, date))")
+
+cursor.execute("TRUNCATE TABLE arbitrage")
+
+cursor.execute("INSERT INTO arbitrage SELECT hostID, visitorID, date,"
+               " MAX(`o1`), MAX(`oX`), MAX(`o2`), MAX(`o1X`), MAX(`oX2`), MAX(`o12`), competition"
+               " FROM games GROUP BY hostID, visitorID, date")
+
+cursor.execute("DELETE FROM arbitrage WHERE (1/o1+1/o2+1/oX>=1)"
+               " and (1/o1+1/oX2>=1) and (1/oX+1/o12>=1) and (1/o2+1/o1X>=1)")
 
 database.commit()
-
-# #         Fortuna.insert(cursor, x.__getitem__(0), x.__getitem__(1))
-# # Fortuna.deletePast(cursor)
-# # database.commit()
-#
-
-#         Sts.insert(cursor, x.__getitem__(0), x.__getitem__(1))
-# Sts.deletePast(cursor)
-# database.commit()
 
 print(str(time.time() - timeS))

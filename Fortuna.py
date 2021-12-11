@@ -45,15 +45,16 @@ def insert(cursor, url, competition):
         # cursor.execute(
         #     "CREATE TABLE IF NOT EXISTS fortuna"
         #     "(host VARCHAR(20) NOT NULL, visitor VARCHAR(20) NOT NULL,"
-        #     "date DATETIME NOT NULL, o1 FLOAT(4,2) NOT NULL, oX FLOAT(4,2) NOT NULL, o2 FLOAT(4,2) NOT NULL,"
-        #     " o1X FLOAT(4,2), oX2 FLOAT(4,2), o12 FLOAT(4,2), competition VARCHAR(25) NOT NULL,"
+        #     "date DATETIME NOT NULL, o1 DECIMAL(4,2) NOT NULL, oX DECIMAL(4,2) NOT NULL, o2 DECIMAL(4,2) NOT NULL,"
+        #     " o1X DECIMAL(4,2), oX2 DECIMAL(4,2), o12 DECIMAL(4,2), competition VARCHAR(25) NOT NULL,"
         #     " updated TINYINT(1) NOT NULL, visited TINYINT(1) NOT NULL, PRIMARY KEY (host, date, competition))")
 
         cursor.execute(
-            "INSERT INTO fortuna (host, visitor, date, o1, oX, o2, o1X, oX2, o12, competition, updated, visited)"
-            "VALUES (%s, %s, STR_TO_DATE(%s, '%d.%m.%Y%H:%i'), %s, %s, %s,%s, %s, %s, %s, 0, 1)"
+            "INSERT INTO games (hostID, visitorID, date, o1, oX, o2, o1X, oX2, o12, competition, updated, visited, bookie)"
+            "VALUES ((SELECT ID FROM teams WHERE fortuna=%s), (SELECT ID FROM teams WHERE fortuna=%s),"
+            " STR_TO_DATE(%s, '%d.%m.%Y%H:%i'), %s, %s, %s, %s, %s, %s, %s, 1, 1, 'Fortuna')"
             "ON DUPLICATE KEY UPDATE "
-            "updated=IF(o1!=%s or oX!=%s or o2!=%s or o1X!=%s or oX2!=%s or o12!=%s, 1, 0),"
+            "updated = IF(o1!=%s or oX!=%s or o2!=%s or o1X!=%s or oX2!=%s or o12!=%s, 1, 0),"
             "o1=%s, oX=%s, o2=%s, o1X=%s, oX2=%s, o12=%s, visited = 1",
             (n.__getitem__(0), n.__getitem__(1), date,
              oddsAll.__getitem__(6 * e).text, oddsAll.__getitem__(6 * e + 1).text,
@@ -68,8 +69,4 @@ def insert(cursor, url, competition):
              oddsAll.__getitem__(6 * e).text, oddsAll.__getitem__(6 * e + 1).text,
              oddsAll.__getitem__(6 * e + 2).text, oddsAll.__getitem__(6 * e + 3).text,
              oddsAll.__getitem__(6 * e + 4).text, oddsAll.__getitem__(6 * e + 5).text))
-        print("fortuna\n")
 
-
-def deletePast(cursor):
-    cursor.execute("DELETE FROM fortuna WHERE date < now() or visited = 0")

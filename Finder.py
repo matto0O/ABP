@@ -14,7 +14,8 @@ def addNamesToDatabase(fList, sList, cursor):
         insertIntoEmpty(left, array)
 
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS teams(ID smallint(4) AUTO_INCREMENT PRIMARY KEY , sts VARCHAR(20) NOT NULL UNIQUE , fortuna VARCHAR(20) NOT NULL UNIQUE )")
+        "CREATE TABLE IF NOT EXISTS teams(ID INT AUTO_INCREMENT PRIMARY KEY , sts VARCHAR(20) NOT NULL UNIQUE ,"
+        " fortuna VARCHAR(20) NOT NULL UNIQUE )")
 
     for elem in array:
         cursor.execute("INSERT IGNORE INTO teams (sts, fortuna) VALUES (%s, %s)",(elem[0],elem[1]))
