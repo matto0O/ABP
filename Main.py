@@ -18,13 +18,12 @@ timeS = time.time()
 
 cursor = database.cursor()
 
-# cursor.execute(
-#     "CREATE TABLE IF NOT EXISTS games"
-#     "(hostID INT, visitorID INT NOT NULL,"
-#     "date DATETIME, o1 DECIMAL(4,2) NOT NULL, oX DECIMAL(4,2) NOT NULL, o2 DECIMAL(4,2) NOT NULL,"
-#     " o1X DECIMAL(4,2), oX2 DECIMAL(4,2), o12 DECIMAL(4,2), competition VARCHAR(25) NOT NULL,"
-#     "updated TINYINT(1) NOT NULL, visited TINYINT(1) NOT NULL, bookie VARCHAR(12) NOT NULL,"
-#     " PRIMARY KEY (hostID, date, bookie))")
+cursor.execute(
+    "CREATE TABLE IF NOT EXISTS games"
+    "(hostID INT, visitorID INT NOT NULL,"
+    " date DATETIME, o1 DECIMAL(4,2) NOT NULL, oX DECIMAL(4,2) NOT NULL, o2 DECIMAL(4,2) NOT NULL,"
+    " competition VARCHAR(25) NOT NULL, updated TINYINT(1) NOT NULL, visited TINYINT(1) NOT NULL,"
+    " bookie VARCHAR(12) NOT NULL, PRIMARY KEY (hostID, date, bookie))")
 
 cursor.execute("UPDATE games SET updated = 0, visited = 0")
 
@@ -42,20 +41,18 @@ for e in range(df_Sts.__len__()):
 
 cursor.execute("DELETE FROM games WHERE date < now() or visited = 0")
 
-# cursor.execute("CREATE TABLE IF NOT EXISTS arbitrage"
-#                 "(hostID INT, visitorID INT,"
-#                 "date DATETIME, o1 DECIMAL(4,2) NOT NULL, oX DECIMAL(4,2) NOT NULL, o2 DECIMAL(4,2) NOT NULL,"
-#                 " o1X DECIMAL(4,2), oX2 DECIMAL(4,2), o12 DECIMAL(4,2), competition VARCHAR(25) NOT NULL,"
-#                 " PRIMARY KEY (hostID, visitorID, date))")
+cursor.execute("CREATE TABLE IF NOT EXISTS arbitrage"
+               "(hostID INT, visitorID INT,"
+               "date DATETIME, o1 DECIMAL(4,2) NOT NULL, oX DECIMAL(4,2) NOT NULL, o2 DECIMAL(4,2) NOT NULL,"
+               " competition VARCHAR(25) NOT NULL, PRIMARY KEY (hostID, visitorID, date))")
 
 cursor.execute("TRUNCATE TABLE arbitrage")
 
 cursor.execute("INSERT INTO arbitrage SELECT hostID, visitorID, date,"
-               " MAX(`o1`), MAX(`oX`), MAX(`o2`), MAX(`o1X`), MAX(`oX2`), MAX(`o12`), competition"
+               " MAX(`o1`), MAX(`oX`), MAX(`o2`), competition"
                " FROM games GROUP BY hostID, visitorID, date")
 
-cursor.execute("DELETE FROM arbitrage WHERE (1/o1+1/o2+1/oX>=1)"
-               " and (1/o1+1/oX2>=1) and (1/oX+1/o12>=1) and (1/o2+1/o1X>=1)")
+cursor.execute("DELETE FROM arbitrage WHERE (1/o1+1/o2+1/oX>=1)")
 
 database.commit()
 
